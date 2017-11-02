@@ -1,2 +1,1 @@
-# pingbot
 Voice Recognition testing

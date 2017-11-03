@@ -23,12 +23,17 @@ class App extends Component {
 
     componentWillMount() {
         annyang.addCommands({
-            'blue team serves': () => this.setServing('blue', true),
-            'red team serves': () => this.setServing('red', true),
+            'reset (the) score': () => this.setServing('red', true),
+
+            'blue (team) serves': () => this.setServing('blue', true),
+            'red (team) serves': () => this.setServing('red', true),
+            
             'red (team) scored': () => this.incrementScore('red', true),
             'blue (team) scored': () => this.incrementScore('blue', true),
+            
             '(the) red (team) scored a point(s)': () => this.incrementScore('red', true),
             '(the) blue (team) scored a point(s)': () => this.incrementScore('blue', true),
+            
             '(a) point(s) (was) (scored) (for) (by) (the) red (team)': () => this.incrementScore('red', true),
             '(a) point(s) (was) (scored) (for) (by) (the) blue (team)': () => this.incrementScore('blue', true),
         });
@@ -80,8 +85,8 @@ class App extends Component {
         this.speakMessage(confirmed + team + ' team serves.');
     }
 
-    incrementScore(team, speak) {
-        this.speak = speak;
+    incrementScore(team, setByVoice) {
+        this.speak = setByVoice;
 
         const redScore = team === 'red' ? this.state.red.score + 1 : this.state.red.score;
         const blueScore = team === 'blue' ? this.state.blue.score + 1 : this.state.blue.score;
@@ -133,38 +138,16 @@ class App extends Component {
     trackGame() {
         const red  = this.state.red.score;
         const blue = this.state.blue.score;
-        // const difference = red - blue <= -1 || red - blue >= 1;
+        const difference = red - blue <= -1 || red - blue >= 1;
 
-        // if (
-        //     (red === 20 && red > blue) || 
-        //     (blue === 20 && blue > red)
-        // ) {
-        //     if (difference <= -1 && !this.state.gamePoint|| difference >= 1 && !this.state.gamePoint) {
-        //         this.setState({
-        //             gamePoint: true,
-        //         })
-        //     }
-        // } else if (red >= 21 || blue >= 21) {
-        //     console.log('Red or blue is over 21');
-
-        //     if (difference <= -2 || difference >= 2) {
-        //         console.log('WINNER');
-        //         return;
-        //     }
-        //     this.setState({
-        //         gamePoint: difference <= -1 || difference >= 1,
-        //     })
-        // }
-        
-        const gamePoint = this.state.gamePoint ? ' Game Point. ' : '';
-
+        const gamePoint = (((red >= 20) || (blue >= 20)) && difference >= 1) ? ' Game Point. ' : '';
         const congrats = this.congrats();
         
         let serveNotice = '';
 
-        if (this.state.turnover && this.state.red.serving) {
+        if (this.state.turnover && this.state.red.serving && gamePoint.length < 1) {
             serveNotice = ' Red Team Serves.';
-        } else if (this.state.turnover && this.state.blue.serving) {
+        } else if (this.state.turnover && this.state.blue.serving && gamePoint.length < 1) {
             serveNotice = ' Blue Team Serves.';
         }
         

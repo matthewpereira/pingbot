@@ -23,17 +23,17 @@ class App extends Component {
 
     componentWillMount() {
         annyang.addCommands({
-            'reset (the) score': () => this.setServing('red', true),
+            'reset (the) score': () => this.resetScore(),
 
             'blue (team) serves': () => this.setServing('blue', true),
             'red (team) serves': () => this.setServing('red', true),
-            
+
             'red (team) scored': () => this.incrementScore('red', true),
             'blue (team) scored': () => this.incrementScore('blue', true),
-            
+
             '(the) red (team) scored a point(s)': () => this.incrementScore('red', true),
             '(the) blue (team) scored a point(s)': () => this.incrementScore('blue', true),
-            
+
             '(a) point(s) (was) (scored) (for) (by) (the) red (team)': () => this.incrementScore('red', true),
             '(a) point(s) (was) (scored) (for) (by) (the) blue (team)': () => this.incrementScore('blue', true),
         });
@@ -90,7 +90,7 @@ class App extends Component {
 
         const redScore = team === 'red' ? this.state.red.score + 1 : this.state.red.score;
         const blueScore = team === 'blue' ? this.state.blue.score + 1 : this.state.blue.score;
-        
+
         const turnover = (redScore + blueScore) % 5 === 0;
 
         this.setState({
@@ -120,10 +120,10 @@ class App extends Component {
             }
         });
     }
-    
+
     congrats() {
         const chance = Math.random() * 100;
-        
+
         if (chance > 80 && chance <= 90) {
             return 'Nice shot! ';
         }
@@ -131,7 +131,7 @@ class App extends Component {
         if (chance > 90) {
             return 'What a play! ';
         }
-        
+
         return '';
     }
 
@@ -142,7 +142,7 @@ class App extends Component {
 
         const gamePoint = (((red >= 20) || (blue >= 20)) && difference >= 1) ? ' Game Point. ' : '';
         const congrats = this.congrats();
-        
+
         let serveNotice = '';
 
         if (this.state.turnover && this.state.red.serving && gamePoint.length < 1) {
@@ -150,7 +150,7 @@ class App extends Component {
         } else if (this.state.turnover && this.state.blue.serving && gamePoint.length < 1) {
             serveNotice = ' Blue Team Serves.';
         }
-        
+
         // Congratulations! Red ##, blue ##. Game Point. Blue serves.
         this.speakMessage(congrats + 'Red ' + red + ', blue ' + blue + '.' + gamePoint + serveNotice);
     }
@@ -159,7 +159,7 @@ class App extends Component {
             const speech = new SpeechSynthesisUtterance(message)
             window.speechSynthesis.speak(speech);
         }
-        
+
         this.speak = false;
     }
 

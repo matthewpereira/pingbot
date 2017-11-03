@@ -13,3 +13,6 @@ Clicking the serving button transfers possession, and clicking either number inc
 
 # Todo:
 - Recognize winning points.
+- Help overlay for describing voice functions
+- Tests
+- Rewrite in Preact/Recompose

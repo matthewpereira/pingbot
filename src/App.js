@@ -24,6 +24,7 @@ class App extends Component {
     componentWillMount() {
         annyang.addCommands({
             'reset (the) score': () => this.resetScore(),
+            'score check': () => this.scoreCheck(),
 
             'blue (team) serves': () => this.setServing('blue', true),
             'red (team) serves': () => this.setServing('red', true),
@@ -134,33 +135,63 @@ class App extends Component {
 
         return '';
     }
-
+    checkGamePoint(red, blue, difference) {
+        if (red >= 20 && red > blue && difference >= 1) {
+            return ' Game Point. Blue Serves.';
+        }
+        if (blue >= 20 && blue > red && difference >= 1) {
+            return ' Game Point. Red Serves.';
+        }
+    }
+    checkWinningPoint(red, blue) {
+        if (red >= 21 && red > blue && red - blue >= 2) {
+            return ' Red wins!';
+        }
+        if (blue >= 21 && blue > red && blue - red >= 2) {
+            return ' Blue wins!';
+        }
+        return false;
+    }
     trackGame() {
         const red  = this.state.red.score;
         const blue = this.state.blue.score;
         const difference = red - blue <= -1 || red - blue >= 1;
 
-        const gamePoint = (((red >= 20) || (blue >= 20)) && difference >= 1) ? ' Game Point. ' : '';
+        const winningPoint = this.checkWinningPoint(red, blue);
+        const gamePoint = !winningPoint ? this.checkGamePoint(red, blue, difference) : null;
         const congrats = this.congrats();
 
         let serveNotice = '';
 
-        if (this.state.turnover && this.state.red.serving && gamePoint.length < 1) {
+        if (this.state.turnover && this.state.red.serving && !gamePoint && !winningPoint) {
             serveNotice = ' Red Team Serves.';
-        } else if (this.state.turnover && this.state.blue.serving && gamePoint.length < 1) {
+        } else if (this.state.turnover && this.state.blue.serving && !gamePoint && !winningPoint) {
             serveNotice = ' Blue Team Serves.';
         }
 
         // Congratulations! Red ##, blue ##. Game Point. Blue serves.
-        this.speakMessage(congrats + 'Red ' + red + ', blue ' + blue + '.' + gamePoint + serveNotice);
+        const message = congrats + 'Red ' + red + ', blue ' + blue + '.' + (gamePoint ? gamePoint : '') + serveNotice + (winningPoint ? winningPoint : '');
+        console.log(message);
+        this.speakMessage(message);
     }
     speakMessage(message) {
         if ('speechSynthesis' in window && this.speak) {
+            console.log('Paused for output...');
+            annyang.pause();
+            setTimeout(() => {
+                console.log('Resuming speech capture');
+                annyang.resume()
+            }, 4000);
             const speech = new SpeechSynthesisUtterance(message)
             window.speechSynthesis.speak(speech);
         }
 
         this.speak = false;
+    }
+
+    scoreCheck() {
+        const speech = new SpeechSynthesisUtterance('Red ' + this.state.red.score + ', blue ' + this.state.blue.score);
+        window.speechSynthesis.speak(speech);
     }
 
     render() {

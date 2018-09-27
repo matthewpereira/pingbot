@@ -16,7 +16,8 @@ class App extends Component {
                 serving: false,
             },
             turnover: false,
-            gamePoint: false
+            gamePoint: false,
+            gameOver: false
         }
         this.speak = false;
     }
@@ -56,6 +57,10 @@ class App extends Component {
     }
 
     setServing(team, setByVoice) {
+        if (this.state.gameOver) {
+            return false;
+        }
+
         if (setByVoice) {
             this.speak = true;
         }
@@ -87,6 +92,10 @@ class App extends Component {
     }
 
     incrementScore(team, setByVoice) {
+        if (this.state.gameOver) {
+            return false;
+        }
+
         this.speak = setByVoice;
 
         const redScore = team === 'red' ? this.state.red.score + 1 : this.state.red.score;
@@ -118,7 +127,8 @@ class App extends Component {
             blue: {
                 ...this.state.blue,
                 score: 0,
-            }
+            },
+            gameOver: false
         });
     }
 
@@ -152,6 +162,10 @@ class App extends Component {
         }
         return false;
     }
+    gameOver = () => (
+        (this.state.red.score > 20 && this.state.red.score - 2 >= this.state.blue.score) ||
+        (this.state.blue.score > 20 && this.state.blue.score - 2 >= this.state.red.score)
+    );
     trackGame() {
         const red  = this.state.red.score;
         const blue = this.state.blue.score;
@@ -160,6 +174,15 @@ class App extends Component {
         const winningPoint = this.checkWinningPoint(red, blue);
         const gamePoint = !winningPoint ? this.checkGamePoint(red, blue, difference) : null;
         const congrats = this.congrats();
+        const gameOver = this.gameOver();
+
+        if (gameOver) {
+            const message = 'Game over!';
+            console.log(message);
+            this.setState({ gameOver: true });
+
+            return this.speakMessage(message);
+        }
 
         let serveNotice = '';
 
@@ -195,6 +218,7 @@ class App extends Component {
     }
 
     render() {
+        console.log(this.state.gameOver)
         return (
         <div className="pingbot">
             <div className="pingbot_scores">
